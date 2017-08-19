@@ -14,49 +14,33 @@ module Rouge
       ws = %r((?:\s|//.*?\n|/[*].*?[*]/)+)
       id = /[a-zA-Z_][a-zA-Z0-9_]*/
 
+
+      def self.analyze_text(text)
+        return 1 if text.shebang? 'pragma solidity'
+      end
+
       def self.keywords
         @keywords ||= Set.new %w(
-          auto break case const continue default do else enum extern
-          for goto if register restricted return sizeof static struct
-          switch typedef union volatile virtual while
-
-          _Alignas _Alignof _Atomic _Generic _Imaginary
-          _Noreturn _Static_assert _Thread_local
+          anonymous as assembly break constant continue contract do
+          else enum event external for function hex if indexed interface
+          internal import is library mapping memory modifier new payable
+          public pragma private return returns storage struct throw
+          using var while
         )
       end
 
       def self.keywords_type
         @keywords_type ||= Set.new %w(
-          int long float short double char unsigned signed void
-
-          jmp_buf FILE DIR div_t ldiv_t mbstate_t sig_atomic_t fpos_t
-          clock_t time_t va_list size_t ssize_t off_t wchar_t ptrdiff_t
-          wctrans_t wint_t wctype_t
-
-          _Bool _Complex int8_t int16_t int32_t int64_t
-          uint8_t uint16_t uint32_t uint64_t int_least8_t
-          int_least16_t int_least32_t int_least64_t
-          uint_least8_t uint_least16_t uint_least32_t
-          uint_least64_t int_fast8_t int_fast16_t int_fast32_t
-          int_fast64_t uint_fast8_t uint_fast16_t uint_fast32_t
-          uint_fast64_t intptr_t uintptr_t intmax_t
-          uintmax_t
-
-          char16_t char32_t
+          int uint address bool
         )
       end
 
       def self.reserved
         @reserved ||= Set.new %w(
-          __asm __int8 __based __except __int16 __stdcall __cdecl
-          __fastcall __int32 __declspec __finally __int61 __try __leave
-          inline _inline __inline naked _naked __naked restrict _restrict
-          __restrict thread _thread __thread typename _typename __typename
+          abstract after case catch default final in inline let
+          match null of pure relocatable static switch try type
+          typeof view
         )
-      end
-
-      def self.analyze_text(text)
-        return 1 if text.shebang? 'pragma solidity'
       end
 
       def self.builtins
