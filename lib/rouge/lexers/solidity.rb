@@ -2,13 +2,13 @@
 
 module Rouge
   module Lexers
-    class C < RegexLexer
-      tag 'c'
-      filenames '*.c', '*.h', '*.idc'
-      mimetypes 'text/x-chdr', 'text/x-csrc'
+    class Solidity < RegexLexer
+      tag 'solidity'
+      filenames '*.sol', '*.solidity'
+      mimetypes 'text/solidity'
 
-      title "C"
-      desc "The C programming language"
+      title "Solidity"
+      desc "Solidity, an Ethereum smart contract programming language"
 
       # optional comment or whitespace
       ws = %r((?:\s|//.*?\n|/[*].*?[*]/)+)
@@ -55,9 +55,8 @@ module Rouge
         )
       end
 
-      # high priority for filename matches
-      def self.analyze_text(*)
-        0.3
+      def self.analyze_text(text)
+        return 1 if text.shebang? 'pragma solidity'
       end
 
       def self.builtins
