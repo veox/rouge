@@ -1,0 +1,10 @@
+pragma solidity ~0.4.15;
+
+/// @author Noel Maersk
+contract EthereumSolidity {
+    event logFallback(address indexed sender, uint value);
+
+    function () payable {
+        logFallback(msg.sender, msg.value);
+    }
+}
