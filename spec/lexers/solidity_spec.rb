@@ -12,7 +12,7 @@ describe Rouge::Lexers::Solidity do
     end
 
     it 'guesses by mimetype' do
-      assert_guess :mimetype => 'text/solidity'
+      assert_guess :mimetype => 'text/x-solidity'
     end
 
     it 'guesses by source' do

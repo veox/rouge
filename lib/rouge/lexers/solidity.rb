@@ -5,7 +5,7 @@ module Rouge
     class Solidity < RegexLexer
       tag 'solidity'
       filenames '*.sol', '*.solidity'
-      mimetypes 'text/solidity'
+      mimetypes 'text/x-solidity'
 
       title "Solidity"
       desc "Solidity, an Ethereum smart contract programming language"
