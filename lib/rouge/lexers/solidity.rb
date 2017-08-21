@@ -31,12 +31,12 @@ module Rouge
         )
       end
 
-      # def self.keywords_constant
-      #   @keywords_constant ||= Set.new %w(
-      #     wei finney szabo ether
-      #     seconds minutes hours days weeks years
-      #   )
-      # end
+      def self.constants
+        @constants ||= Set.new %w(
+          wei finney szabo ether
+          seconds minutes hours days weeks years
+        )
+      end
 
       def self.keywords_type
         @keywords_type ||= Set.new %w(
@@ -61,9 +61,6 @@ module Rouge
 
       state :expr_bol do
         mixin :inline_whitespace
-
-        rule /#if\s0/, Comment, :if_0
-        rule /#/, Comment::Preproc, :macro
 
         rule(//) { pop! }
       end
@@ -94,7 +91,8 @@ module Rouge
 
       state :statements do
         mixin :whitespace
-        rule /(u8|u|U|L)?"/, Str, :string
+        rule /(hex)?\"/, Str, :string_double
+        rule /(hex)?\'/, Str, :string_single
         rule %r((u8|u|U|L)?'(\\.|\\[0-7]{1,3}|\\x[a-f0-9]{1,2}|[^\\'\n])')i, Str::Char
         rule /0x[0-9a-f]+[lu]*/i, Num::Hex
         rule /0[0-7]+[lu]*/i, Num::Oct
@@ -111,6 +109,8 @@ module Rouge
             token Keyword
           elsif self.class.keywords_type.include? name
             token Keyword::Type
+          elsif self.class.constants.include? name
+            token Keyword::Constant
           elsif self.class.reserved.include? name
             token Keyword::Reserved
           elsif self.class.builtins.include? name
@@ -119,11 +119,6 @@ module Rouge
             token Name
           end
         end
-      end
-
-      state :case do
-        rule /:/, Punctuation, :pop!
-        mixin :statements
       end
 
       state :root do
@@ -179,29 +174,23 @@ module Rouge
         rule /}/, Punctuation, :pop!
       end
 
-      state :string do
-        rule /"/, Str, :pop!
-        rule /\\([\\abfnrtv"']|x[a-fA-F0-9]{2,4}|[0-7]{1,3})/, Str::Escape
-        rule /[^\\"\n]+/, Str
-        rule /\\\n/, Str
+      state :string_common do
+        rule /\\(u[a-fA-F0-9]{4}|x..|[^x])/, Str::Escape
+        rule /[^\\\"\'\n]+/, Str
+        rule /\\\n/, Str # line continuation
         rule /\\/, Str # stray backslash
       end
 
-      state :macro do
-        # NB: pop! goes back to :bol
-        rule /\n/, Comment::Preproc, :pop!
-        rule %r([^/\n\\]+), Comment::Preproc
-        rule /\\./m, Comment::Preproc
-        mixin :inline_whitespace
-        rule %r(/), Comment::Preproc
+      state :string_double do
+        mixin :string_common
+        rule /"/, Str, :pop!
+        rule /\'/, Str
       end
 
-      state :if_0 do
-        # NB: no \b here, to cover #ifdef and #ifndef
-        rule /^\s*#if/, Comment, :if_0
-        rule /^\s*#\s*el(?:se|if)/, Comment, :pop!
-        rule /^\s*#\s*endif\b.*?(?<!\\)\n/m, Comment, :pop!
-        rule /.*?\n/, Comment
+      state :string_single do
+        mixin :string_common
+        rule /'/, Str, :pop!
+        rule /\"/, Str
       end
     end
   end

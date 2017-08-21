@@ -43,11 +43,11 @@ library Assembly {
 
 contract Strings {
     // `double` is not a keyword (yet)
-    string double = "This\ is a string\nwith \"escapes\",\
+    string doublestr = "This\ is a string\nwith \"escapes\",\
 and it's multi-line. // no comment"; // comment ok // even nested :)
-    string single = 'This\ is a string\nwith "escapes",\
+    string singlestr = 'This\ is a string\nwith "escapes",\
 and it\'s multi-line. // no comment'; // same thing, single-quote
-    string hex = hex'537472696e67732e73656e6428746869732e62616c616e6365293b';
+    string hexstr = hex'537472696e67732e73656e6428746869732e62616c616e6365293b';
 
     function(){}
 }
