@@ -26,13 +26,23 @@ module Rouge
           internal import is library mapping memory modifier new payable
           public pragma private return returns storage struct throw
           using var while
+
+          delete
         )
       end
+
+      # def self.keywords_constant
+      #   @keywords_constant ||= Set.new %w(
+      #     wei finney szabo ether
+      #     seconds minutes hours days weeks years
+      #   )
+      # end
 
       def self.keywords_type
         @keywords_type ||= Set.new %w(
           int uint address bool
         )
+        # TODO: {int,uint,bytes,fixed,ufixed}{MxN}
       end
 
       def self.reserved
@@ -86,8 +96,6 @@ module Rouge
         mixin :whitespace
         rule /(u8|u|U|L)?"/, Str, :string
         rule %r((u8|u|U|L)?'(\\.|\\[0-7]{1,3}|\\x[a-f0-9]{1,2}|[^\\'\n])')i, Str::Char
-        rule %r((\d+[.]\d*|[.]?\d+)e[+-]?\d+[lu]*)i, Num::Float
-        rule %r(\d+e[+-]?\d+[lu]*)i, Num::Float
         rule /0x[0-9a-f]+[lu]*/i, Num::Hex
         rule /0[0-7]+[lu]*/i, Num::Oct
         rule /\d+[lu]*/i, Num::Integer
