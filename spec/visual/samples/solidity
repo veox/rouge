@@ -61,12 +61,14 @@ contract Types is Strings {
     uint256 ui256; // valid
     uint9001 ui9001; // invalid
     bytes1 b1; //valid
-    bytes42 b42; // invalid - M out of range for `bytes`
+    bytes42 b42; // invalid: M out of range for `bytes`
     
     // typesMxN (compiler doesn't choke on invalid)
     fixed0x8 f0x8; // valid
     fixed8x0 f8x0; // invalid - N can't be 0
-    ufixed42x217 uf42x217; // invalid - M and N must be multiples of 8
+    ufixed42x217 uf42x217; // invalid: M and N must be multiples of 8
+    fixed224x16 f224x16; // valid
+    ufixed256x256 uf256x256; // invalid: M+N > 256
 
     // special cases (internally not types)
     string str; // dynamic array (not a value-type)

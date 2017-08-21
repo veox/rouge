@@ -40,9 +40,24 @@ module Rouge
 
       def self.keywords_type
         @keywords_type ||= Set.new %w(
-          int uint address bool
+          int uint bytes fixed ufixed address bool
         )
-        # TODO: {int,uint,bytes,fixed,ufixed}{MxN}
+
+        # bytes1 .. bytes32
+        @keywords_type.merge( (1..32).map { |i| "bytes#{i}" } )
+
+        # size helpers
+        sizesm = (0..256).step(8)
+        sizesn = (8..256).step(8)
+        sizesmxn = sizesm.map { |m| m }
+                     .product( sizesn.map { |n| n } )
+                     .select { |m,n| m+n <= 256 }
+        # [u]int8 .. [u]int256
+        @keywords_type.merge( sizesn.map { |n|  "int#{n}" } )
+        @keywords_type.merge( sizesn.map { |n| "uint#{n}" } )
+        # [u]fixed{MxN}
+        @keywords_type.merge(sizesmxn.map { |m,n|  "fixed#{m}x#{n}" })
+        @keywords_type.merge(sizesmxn.map { |m,n| "ufixed#{m}x#{n}" })
       end
 
       def self.reserved
