@@ -1,10 +1,24 @@
 pragma solidity ~0.4.15;
 
-/// @author Noel Maersk
-contract EthereumSolidity {
-    event logFallback(address indexed sender, uint value);
+interface Mirror {
+    function reflect() external payable returns(bool /* ain't I pretty?.. */);
+}
 
-    function () payable {
-        logFallback(msg.sender, msg.value);
+contract Mirror {
+    event logMessage(address indexed sender, uint256 value, uint256 gas, bytes data);
+
+    function reflect() external payable returns(bool retval) {
+        require(msg.value != 0);
+        assert(msg.data != 0x0);
+
+        Mirror rorrim = new Mirror(msg.sender);
+        retval = rorrim.reflect.value(msg.value).gas(msg.gas)();
+
+        logMessage(msg.sender, msg.value, msg.gas, msg.data);
+        return retval;
+    }
+
+    function () { // no funny stuff
+       throw;
     }
 }

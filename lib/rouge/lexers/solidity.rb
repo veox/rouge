@@ -19,6 +19,7 @@ module Rouge
         return 1 if text.shebang? 'pragma solidity'
       end
 
+      # TODO: seperate by "type"
       def self.keywords
         @keywords ||= Set.new %w(
           anonymous as assembly break constant continue contract do
@@ -26,8 +27,8 @@ module Rouge
           internal import is library mapping memory modifier new payable
           public pragma private return returns storage struct throw
           using var while
-
           delete
+          assert require
         )
       end
 
