@@ -68,7 +68,6 @@ module Rouge
       # :expr_bol is the same as :bol but without labels, since
       # labels can only appear at the beginning of a statement.
       state :bol do
-        rule /#{id}:(?!:)/, Name::Label
         mixin :expr_bol
       end
 
@@ -95,7 +94,6 @@ module Rouge
         rule /(hex)?\'/, Str, :string_single
         rule %r((u8|u|U|L)?'(\\.|\\[0-7]{1,3}|\\x[a-f0-9]{1,2}|[^\\'\n])')i, Str::Char
         rule /0x[0-9a-f]+[lu]*/i, Num::Hex
-        rule /0[0-7]+[lu]*/i, Num::Oct
         rule /\d+[lu]*/i, Num::Integer
         rule %r(\*/), Error
         rule %r([~!%^&*+=\|?:<>/-]), Operator
@@ -123,40 +121,8 @@ module Rouge
 
       state :root do
         mixin :expr_whitespace
-
-        # functions
-        rule %r(
-          ([\w*\s]+?[\s*]) # return arguments
-          (#{id})          # function name
-          (\s*\([^;]*?\))  # signature
-          (#{ws})({)         # open brace
-        )mx do |m|
-          # TODO: do this better.
-          recurse m[1]
-          token Name::Function, m[2]
-          recurse m[3]
-          recurse m[4]
-          token Punctuation, m[5]
-          push :function
-        end
-
-        # function declarations
-        rule %r(
-          ([\w*\s]+?[\s*]) # return arguments
-          (#{id})          # function name
-          (\s*\([^;]*?\))  # signature
-          (#{ws})(;)       # semicolon
-        )mx do |m|
-          # TODO: do this better.
-          recurse m[1]
-          token Name::Function, m[2]
-          recurse m[3]
-          recurse m[4]
-          token Punctuation, m[5]
-          push :statement
-        end
-
         rule(//) { push :statement }
+        # TODO: function declarations
       end
 
       state :statement do
@@ -164,14 +130,6 @@ module Rouge
         mixin :expr_whitespace
         mixin :statements
         rule /[{}]/, Punctuation
-      end
-
-      state :function do
-        mixin :whitespace
-        mixin :statements
-        rule /;/, Punctuation
-        rule /{/, Punctuation, :function
-        rule /}/, Punctuation, :pop!
       end
 
       state :string_common do
@@ -183,13 +141,13 @@ module Rouge
 
       state :string_double do
         mixin :string_common
-        rule /"/, Str, :pop!
+        rule /\"/, Str, :pop!
         rule /\'/, Str
       end
 
       state :string_single do
         mixin :string_common
-        rule /'/, Str, :pop!
+        rule /\'/, Str, :pop!
         rule /\"/, Str
       end
     end
